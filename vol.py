@@ -1,4 +1,27 @@
 #!/usr/bin/env python3
+"""
+Simplified interface for controlling `amixer` audio levels.
+
+Usage:
+    script.py <capability> [action]
+
+Parameters:
+    capability:
+        - p: Playback
+        - c: Capture
+    action (optional):
+        - +:   Increase volume by 5%
+        - -:   Decrease volume by 5%
+        - =:   Set volume to 0%
+        - t:   Toggle mute/unmute
+        - i3b: Increase or decrease volume depending on value of BLOCK_BUTTON environment variable
+
+Example:
+    script.py p +  # Increases playback volume by 5%
+
+    (when invoked from i3blocks) script.py p i3b
+"""
+
 import sys
 import os
 import subprocess
@@ -32,6 +55,15 @@ def parse_amixer_output(output, cap_req):
 
 
 def main():
+    try:
+        capability_req = sys.argv[1]
+    except IndexError:
+        capability_req = '--help'
+
+    if capability_req in ['--help', '-h']:
+        print(__doc__)
+        exit(0)
+
     action_req = sys.argv[2] if len(sys.argv) > 2 else '='
 
     capability = CAPABILITIES.get(capability_req, CAPABILITIES['p'])
